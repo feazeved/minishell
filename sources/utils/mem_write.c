@@ -1,27 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   memory.c                                           :+:      :+:    :+:   */
+/*   mem_write.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adeimlin <adeimlin@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 17:35:52 by adeimlin          #+#    #+#             */
-/*   Updated: 2025/07/07 19:18:15 by adeimlin         ###   ########.fr       */
+/*   Updated: 2025/11/13 10:22:28 by adeimlin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdint.h>
 #include <stddef.h>
+#include <unistd.h>
 
 static
-void	*ft_memrcpy(void *dst_void, const void *src_void, size_t length)
+void	*stt_memrcpy(void *vdst, const void *vsrc, size_t length)
 {
 	char		*dst;
-	const char	*src = (const char *) src_void + length;
+	const char	*src = (const char *) vsrc + length;
 
-	if ((uintptr_t) dst_void == (uintptr_t) src_void)
-		return (dst_void);
-	dst = ((char *) dst_void) + length;
+	if ((uintptr_t) vdst == (uintptr_t) vsrc)
+		return (vdst);
+	dst = ((char *) vdst) + length;
 	while (length > sizeof(uintptr_t)
 		&& (((uintptr_t)dst | (uintptr_t)src) & (sizeof(uintptr_t) - 1)))
 	{
@@ -40,17 +41,17 @@ void	*ft_memrcpy(void *dst_void, const void *src_void, size_t length)
 		*--dst = *--src;
 		length--;
 	}
-	return (dst_void);
+	return (vdst);
 }
 
-void	*ft_memcpy(void *dst_void, const void *src_void, size_t length)
+void	*ft_memmove(void *vdst, const void *vsrc, size_t length)
 {
 	char		*dst;
-	const char	*src = (const char *) src_void;
+	const char	*src = (const char *) vsrc;
 
-	if ((uintptr_t) dst_void >= (uintptr_t) src_void)
-		return (ft_memrcpy(dst_void, src_void, length));
-	dst = (char *) dst_void;
+	if ((uintptr_t) vdst >= (uintptr_t) vsrc)
+		return (stt_memrcpy(vdst, vsrc, length));
+	dst = (char *) vdst;
 	while (length > sizeof(uintptr_t)
 		&& (((uintptr_t)dst | (uintptr_t)src) & (sizeof(uintptr_t) - 1)))
 	{
@@ -69,54 +70,55 @@ void	*ft_memcpy(void *dst_void, const void *src_void, size_t length)
 		*dst++ = *src++;
 		length--;
 	}
-	return (dst_void);
+	return (vdst);
 }
 
-void	*ft_bzero(void *dst_void, size_t length)
+// With O1, calls builtin memcpy
+void	\
+*ft_memcpy(void *restrict vdst, const void *restrict vsrc, size_t length)
 {
-	uint8_t	*dst;
+	unsigned char		*restrict dst;
+	const unsigned char	*restrict src = vsrc;
 
-	dst = (uint8_t *) dst_void;
-	while (((uintptr_t)dst & (sizeof(uintptr_t) - 1)) && length > 0)
+	dst = vdst;
+	while (length > 0)
 	{
-		*dst++ = 0u;
+		*dst++ = *src++;
 		length--;
 	}
-	while (length >= sizeof(uintptr_t))
+	return (vdst);
+}
+
+uint8_t	ft_lmcpy\
+(void *restrict vdst, const void *restrict vsrc, size_t length, char *end)
+{
+	unsigned char		*restrict dst;
+	const unsigned char	*restrict src = vsrc;
+
+	dst = vdst;
+	if ((uintptr_t)(dst + length) > (uintptr_t) end)
 	{
-		*((uintptr_t *)dst) = 0UL;
-		dst += sizeof(uintptr_t);
-		length -= sizeof(uintptr_t);
+		write(2, "msh_memcpy: Out of memory\n", 26);
+		return (1);
 	}
 	while (length > 0)
 	{
-		*dst++ = 0u;
+		*dst++ = *src++;
 		length--;
 	}
-	return (dst_void);
+	return (0);
 }
 
-void	*ft_memset(void *dst_void, const uint8_t byte, size_t length)
+// With O1, calls builtin memset
+void	*ft_memset(void *vdst, const uint8_t byte, size_t length)
 {
 	uint8_t			*dst;
-	const uintptr_t	word_byte = byte * (0x0101010101010101 & UINTPTR_MAX);
 
-	dst = (uint8_t *) dst_void;
-	while (((uintptr_t)dst & (sizeof(uintptr_t) - 1)) && length > 0)
-	{
-		*dst++ = byte;
-		length--;
-	}
-	while (length >= sizeof(uintptr_t))
-	{
-		*((uintptr_t *)dst) = word_byte;
-		dst += sizeof(uintptr_t);
-		length -= sizeof(uintptr_t);
-	}
+	dst = (uint8_t *) vdst;
 	while (length > 0)
 	{
 		*dst++ = byte;
 		length--;
 	}
-	return (dst_void);
+	return (vdst);
 }

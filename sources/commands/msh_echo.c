@@ -1,28 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   echo.c                                             :+:      :+:    :+:   */
+/*   msh_echo.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: adeimlin <adeimlin@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/21 10:25:13 by adeimlin          #+#    #+#             */
-/*   Updated: 2025/10/21 11:56:18 by adeimlin         ###   ########.fr       */
+/*   Created: 2025/10/25 13:54:49 by adeimlin          #+#    #+#             */
+/*   Updated: 2025/11/10 11:33:19 by adeimlin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-/*
-Echo prints out the arguments to the standard output, with a space separating
-them followed by a newline (-n suppresses the newline)
-*/
 
 #include <stdint.h>
 #include <stddef.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <minishell.h>
+#include "minishell.h"
 
-// To do: Error handling
-int	cmd_echo(int argc, const char **argv)
+/* Echo prints out the arguments to stdout, with a space separating them
+followed by a newline (-n suppresses the newline)
+To do: Error handling */
+int	msh_echo(int argc, const char **argv, t_env *env)
 {
 	size_t	i;
 	uint8_t	no_nl;

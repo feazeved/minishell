@@ -6,7 +6,7 @@
 /*   By: adeimlin <adeimlin@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/13 10:43:54 by adeimlin          #+#    #+#             */
-/*   Updated: 2025/10/21 12:34:28 by adeimlin         ###   ########.fr       */
+/*   Updated: 2025/11/13 14:17:31 by adeimlin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,67 +15,49 @@
 
 # include <stdint.h>
 # include <stddef.h>
-# include <unistd.h>
 # include <stdbool.h>
+# include <unistd.h>
 
-# ifndef FT_PAGE_SIZE
-#  define FT_PAGE_SIZE 4096
-# endif
+# include "msh_types.h"
 
-# ifndef FT_PATH_MAX
-#  define FT_PATH_MAX 4096
-# endif
+size_t		ft_strlen(const char *str);
+size_t		ft_strlcpy(char *dst, const char *src, size_t dst_size);
+size_t		ft_strlcat(char *dst, const char *src, size_t dst_size);
+int32_t		ft_strncmp(const char *str1, const char *str2, size_t length);
+int32_t		ft_strwcmp(const char *str, const char *pattern);
+uint8_t		ft_ascii(const char c);
 
-# ifndef FT_TOKEN_MAX
-#  define FT_TOKEN_MAX 256
-# endif
+const char	*ft_strfind(const char *str, const char *charset, uint8_t ref);
+const char	*ft_strchr(const char *str, unsigned char c);
 
-# define PROMPT "minishell> "
+void		*ft_memmove(void *vdst, const void *vsrc, size_t length);
+void		*ft_memset(void *dst_void, const uint8_t byte, size_t length);
+void		*ft_memcpy(void *restrict vdst, const void *restrict vsrc, size_t length);
+uint8_t		ft_lmcpy(void *restrict vdst, const void *restrict vsrc, size_t length, char *end);
 
-size_t	ft_strlen(const char *str);
-size_t	ft_strlcpy(char *dst, const char *src, size_t dst_size);
-size_t	ft_strlcat(char *dst, const char *src, size_t dst_size);
-int32_t	ft_strncmp(const char *str1, const char *str2, size_t length);
-int32_t	ft_strcmp(const char *str1, const char *str2);
+ssize_t		ft_write(int fd, const void *buffer, size_t length);
 
-void	*ft_memcpy(void *dst_void, const void *src_void, size_t length);
-void	*ft_bzero(void *dst_void, size_t length);
-void	*ft_memset(void *dst_void, const uint8_t byte, size_t length);
+size_t		env_find(t_env *env, const char *entry, size_t length);
+uint8_t		env_del(t_env *env, const char *entry);
+uint8_t		env_init(t_env *env, const char **envp_src);
+uint8_t		env_expand(const char **str, t_argv *arg, t_env *env);
 
-ssize_t	ft_write(int fd, const void *buffer, size_t length);
+int			tokenize(t_shell *shell, char *input);
+int			token_not_implemented(char **input);
+void		token_word_handler(t_token *token, char **input);
 
-typedef struct s_shell
-{
-	char	*input;
-	char	**envp;
-	t_token	token[FT_TOKEN_MAX];
-	bool	non_interactive;
-}	t_shell;
+int			syntax_validation(t_shell *shell, int parenthesis_depth);
+int			syntax_check_end(t_token last_token);
+int			syntax_check_start(t_token first_token);
+void		syntax_print_error(t_token token);
 
-typedef struct s_token
-{
-	t_str	str;
-	t_type	type;
-}	t_token;
-
-typedef enum e_type
-{
-	WORD = 0,
-	OR = 1 << 1,
-	AND = 1 << 2,
-	CMD = 1 << 3,
-}	t_type;
-
-typedef struct s_str
-{
-	char	*ptr;
-	size_t	length;
-}	t_str;
-
-typedef struct s_kstr
-{
-	const char	*ptr;
-	size_t		length;
-}	t_kstr;
+int			expand_token(t_token *token, t_env *env, t_argv *arg, size_t count);
+int			msh_cd(int argc, const char **argv, t_env *env);
+int			msh_pwd(int argc, const char **argv, t_env *env);
+int			msh_exit(int argc, const char **argv, t_env *env);
+int			msh_unset(int argc, const char **argv, t_env *env);
+int			msh_env(int argc, const char **argv, t_env *env);
+int			msh_export(int argc, const char **argv, t_env *env);
+int			msh_echo(int argc, const char **argv, t_env *env);
 
 #endif

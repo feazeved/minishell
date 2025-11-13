@@ -4,12 +4,15 @@ BUILD_PATH = build
 INC_PATH = includes
 OBJ_PATH = $(BUILD_PATH)/obj
 BIN = $(BUILD_PATH)/$(NAME)
-VPATH = sources sources/utils sources/commands
+VPATH = sources sources/utils sources/env sources/commands sources/core sources/exec sources/history
 
 # Files --------------------------------------- #
 LIBS =
-SRCS = main.c heredoc.c memory.c string.c \
-echo.c syscalls.c
+SRCS = mem_read.c mem_write.c str_read.c str_write.c io_utils.c syscalls.c \
+test.c
+# exec.c heredoc.c main.c pipe.c
+# msh_cd.c msh_dispatch.c msh_echo.c msh_env.c msh_exit.c msh_export.c msh_pwd.c msh_unset.c
+
 OBJS = $(addprefix $(OBJ_PATH)/, $(SRCS:.c=.o))
 
 # Flags --------------------------------------- #
